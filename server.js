@@ -1,23 +1,34 @@
 import cors from 'cors';
 import express from 'express';
 import fetch from 'node-fetch';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configura CORS para tu frontend (ajusta el origen)
+// Utilidades para __dirname en ESModules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middleware de CORS
 app.use(cors({
-    origin: 'https://front-altai.netlify.app', // Cambia si usas otro dominio frontend
+    origin: 'https://front-altai.netlify.app',
     methods: ['POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type']
 }));
 
 app.use(express.json());
 
+// Servir archivos estáticos desde /public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Manejo de preflight
 app.options('/enviarYDescargar', (req, res) => {
     res.sendStatus(200);
 });
 
+// Ruta POST
 app.post('/enviarYDescargar', async (req, res) => {
     try {
         const body = req.body;
@@ -42,7 +53,7 @@ app.post('/enviarYDescargar', async (req, res) => {
         }
 
         // Verificar reCAPTCHA con Google
-        const secretKey = '6LeYyF4rAAAAAB2gm91IIiD9RQYgSkBrbkkkpWSy'; // Pon tu clave secreta
+        const secretKey = '6LeYyF4rAAAAAB2gm91IIiD9RQYgSkBrbkkkpWSy';
         const params = new URLSearchParams();
         params.append('secret', secretKey);
         params.append('response', recaptchaToken);
@@ -51,6 +62,7 @@ app.post('/enviarYDescargar', async (req, res) => {
             method: 'POST',
             body: params
         });
+
         const recaptchaJson = await recaptchaRes.json();
 
         if (!recaptchaJson.success) {
@@ -84,10 +96,10 @@ app.post('/enviarYDescargar', async (req, res) => {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
 
-        // Responder con URL de PDF para descargar y redirigir
+        // Retornar la ruta al PDF local (servido desde /public)
         return res.status(200).json({
             message: 'Formulario enviado correctamente',
-            pdfUrl: 'https://javer.com.mx/descargables/1748907914225.pdf',
+            pdfUrl: '/brochure.pdf'
         });
 
     } catch (error) {

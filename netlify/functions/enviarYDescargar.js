@@ -1,14 +1,12 @@
 import fetch from 'node-fetch';
 
 export async function handler(event, context) {
-    // Cabeceras CORS para permitir peticiones desde otro origen
     const headers = {
         'Access-Control-Allow-Origin': 'https://front-altai.netlify.app',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    // Responder OPTIONS para preflight CORS
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -39,19 +37,18 @@ export async function handler(event, context) {
             }
         }
 
-
-        // Validar token reCAPTCHA
+        // Validar reCAPTCHA
         const recaptchaToken = body['g-recaptcha-response'];
         if (!recaptchaToken) {
             return {
                 statusCode: 400,
-                headers, // <-- aquí
+                headers,
                 body: JSON.stringify({ error: 'No reCAPTCHA token' }),
             };
         }
 
-        // Validar checkbox "aviso"
-        if (!body.aviso || body.aviso !== true && body.aviso !== 'true' && body.aviso !== 'on') {
+        // Validar checkbox de aviso
+        if (!body.aviso || !(body.aviso === true || body.aviso === 'true' || body.aviso === 'on')) {
             return {
                 statusCode: 400,
                 headers,
@@ -59,39 +56,40 @@ export async function handler(event, context) {
             };
         }
 
-        // Verifica token con Google
-        const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Debes poner tu clave en Netlify env vars
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`;
+        // Verificar token reCAPTCHA directamente (sin variable de entorno)
+        const secretKey = '6LeYyF4rAAAAAB2gm91IIiD9RQYgSkBrbkkkpWSy';
+        const params = new URLSearchParams();
+        params.append('secret', secretKey);
+        params.append('response', recaptchaToken);
 
-        const recaptchaRes = await fetch(verifyUrl, { method: 'POST' });
+        const recaptchaRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+            method: 'POST',
+            body: params,
+        });
+
         const recaptchaJson = await recaptchaRes.json();
 
         if (!recaptchaJson.success) {
             return {
-                statusCode: 400,
+                statusCode: 403,
                 headers,
-                body: JSON.stringify({ error: 'reCAPTCHA verification failed' }),
+                body: JSON.stringify({ error: 'reCAPTCHA inválido' }),
             };
         }
 
-
-        // Enviar datos a Salesforce WebToLead
+        // Enviar datos a Salesforce
         const salesforceUrl = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
-
-        // Construimos form data para Salesforce
         const salesforceData = new URLSearchParams();
 
-        // Mapea los campos que enviaste en el frontend, excepto reCAPTCHA que no va a Salesforce
         const fieldsToSend = {
             oid: '00Do0000000b6Io',
             first_name: body.first_name,
             last_name: body.last_name,
             phone: body.phone,
             email: body.email,
-            '00N3l00000Q7A54': body['00N3l00000Q7A54'], // FraccionamientoInterno
-            '00N3l00000Q7A57': body['00N3l00000Q7A57'], // Fuente
-            '00N3l00000Q7A4k': body['00N3l00000Q7A4k'], // Asunto
-            // puedes agregar más campos si necesitas
+            '00N3l00000Q7A54': body['00N3l00000Q7A54'],
+            '00N3l00000Q7A57': body['00N3l00000Q7A57'],
+            '00N3l00000Q7A4k': body['00N3l00000Q7A4k'],
         };
 
         for (const key in fieldsToSend) {
@@ -100,16 +98,12 @@ export async function handler(event, context) {
             }
         }
 
-        // POST a Salesforce
-        const salesforceResponse = await fetch(salesforceUrl, {
+        await fetch(salesforceUrl, {
             method: 'POST',
             body: salesforceData,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         });
 
-        // Puedes validar salesforceResponse.status o content si quieres
-
-        // Respuesta OK
         return {
             statusCode: 200,
             headers,

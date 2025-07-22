@@ -1,0 +1,16 @@
+{
+  "name": "backend-landing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "keywords": [],
+  "author": "René Cerón",
+  "license": "ISC",
+  "description": "Backend para landing Javer",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "type": "module"
+}

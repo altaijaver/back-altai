@@ -20,12 +20,25 @@ export async function handler(event, context) {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers,
             body: 'Method Not Allowed',
         };
     }
 
     try {
         const body = JSON.parse(event.body);
+
+        const requiredFields = ['first_name', 'last_name', 'phone', 'email'];
+        for (const field of requiredFields) {
+            if (!body[field]) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ error: `El campo ${field} es obligatorio.` }),
+                };
+            }
+        }
+
 
         // Validar token reCAPTCHA
         const recaptchaToken = body['g-recaptcha-response'];
@@ -34,6 +47,15 @@ export async function handler(event, context) {
                 statusCode: 400,
                 headers, // <-- aquí
                 body: JSON.stringify({ error: 'No reCAPTCHA token' }),
+            };
+        }
+
+        // Validar checkbox "aviso"
+        if (!body.aviso || body.aviso !== true && body.aviso !== 'true' && body.aviso !== 'on') {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Debes aceptar el aviso de privacidad.' }),
             };
         }
 

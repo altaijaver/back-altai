@@ -34,7 +34,16 @@ app.post('/enviarYDescargar', async (req, res) => {
         const body = req.body;
 
         // Validar campos obligatorios
-        const requiredFields = ['first_name', 'phone', 'email'];
+        const requiredFields = [
+            'first_name',
+            'phone',
+            'email',
+            '00N3l00000Q7A54',
+            '00N3l00000Q7A57',
+            '00N3l00000Q7A4k',
+            '00N3l00000Q7A4n',
+            '00N3l00000Q7A5S'
+        ];
         for (const field of requiredFields) {
             if (!body[field]) {
                 return res.status(400).json({ error: `El campo ${field} es obligatorio.` });
@@ -106,7 +115,16 @@ app.post('/enviar', async (req, res) => {
     try {
         const body = req.body;
 
-        const requiredFields = ['first_name', 'phone', 'email'];
+        const requiredFields = [
+            'first_name',
+            'phone',
+            'email',
+            '00N3l00000Q7A54',
+            '00N3l00000Q7A57',
+            '00N3l00000Q7A4k',
+            '00N3l00000Q7A4n',
+            '00N3l00000Q7A5S'
+        ];
         for (const field of requiredFields) {
             if (!body[field]) {
                 return res.status(400).json({ error: `El campo ${field} es obligatorio.` });

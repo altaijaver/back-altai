@@ -1,4 +1,4 @@
-import cors from 'cors';
+// import cors from 'cors';
 import express from 'express';
 import fetch from 'node-fetch';
 import path from 'path';
@@ -18,25 +18,26 @@ const __dirname = path.dirname(__filename);
 //     allowedHeaders: ['Content-Type']
 // }));
 
-const allowedOrigins = [
-    'https://altaijaver.mx'
-];
+// const allowedOrigins = [
+//     'https://altaijaver.mx'
+// ];
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('CORS no permitido'));
-        }
-    },
-    methods: ['POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type']
-}));
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (!origin || allowedOrigins.includes(origin)) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('CORS no permitido'));
+//         }
+//     },
+//     methods: ['POST', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type']
+// }));
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "https://altaijaver.mx");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader("Content-Security-Policy", "frame-ancestors 'self' https://www.google.com")
     next();
 });
 

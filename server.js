@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 // Middleware de CORS
 app.use(cors({
-    origin: 'https://front-altai.netlify.app',
+    origin: 'https://altaijaver.mx/',
     methods: ['POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type']
 }));

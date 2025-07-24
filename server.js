@@ -33,6 +33,23 @@ app.post('/enviarYDescargar', async (req, res) => {
     try {
         const body = req.body;
 
+        // Validación avanzada de campos clave
+        const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,}$/;
+        if (!nameRegex.test(body.first_name)) {
+            return res.status(400).json({ error: 'Nombre inválido. Usa solo letras y al menos 2 caracteres.' });
+        }
+
+        const phoneRegex = /^[0-9]{8,10}$/;
+        if (!phoneRegex.test(body.phone)) {
+            return res.status(400).json({ error: 'Teléfono inválido. Debe contener solo números y al menos 8 dígitos.' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(body.email)) {
+            return res.status(400).json({ error: 'Correo electrónico inválido.' });
+        }
+
+
         // Validar campos obligatorios
         const requiredFields = [
             'first_name',
@@ -114,6 +131,22 @@ app.post('/enviarYDescargar', async (req, res) => {
 app.post('/enviar', async (req, res) => {
     try {
         const body = req.body;
+        // Validación avanzada de campos clave
+        const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,}$/;
+        if (!nameRegex.test(body.first_name)) {
+            return res.status(400).json({ error: 'Nombre inválido. Usa solo letras y al menos 2 caracteres.' });
+        }
+
+        const phoneRegex = /^[0-9]{8,10}$/;
+        if (!phoneRegex.test(body.phone)) {
+            return res.status(400).json({ error: 'Teléfono inválido. Debe contener solo números y al menos 8 dígitos.' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(body.email)) {
+            return res.status(400).json({ error: 'Correo electrónico inválido.' });
+        }
+
 
         const requiredFields = [
             'first_name',

@@ -35,11 +35,16 @@ const __dirname = path.dirname(__filename);
 // }));
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://altaijaver.mx");
+    const allowedOrigins = ["https://altaijaver.mx", "https://www.altaijaver.mx"];
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+    }
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.setHeader("Content-Security-Policy", "frame-ancestors 'self' https://www.google.com")
+    res.setHeader("Content-Security-Policy", "frame-ancestors 'self' https://www.google.com");
     next();
 });
+
 
 app.use(express.json());
 
